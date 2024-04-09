@@ -2,7 +2,6 @@ use {
     anyhow::{anyhow, Result},
     borsh::BorshDeserialize,
     clap::{command, Parser, Subcommand},
-    presale::state::PresaleState,
     serde::Deserialize,
     solana_cli_config,
     solana_client::rpc_client::RpcClient,
@@ -14,6 +13,7 @@ use {
         transaction::Transaction,
     },
     std::{fs, str::FromStr},
+    yield_tokenizer::state::YieldTokenizerState,
 };
 
 #[derive(Parser)]
@@ -30,11 +30,29 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    Init,
-    Tokenize { amount: u64 },
-    Redeem { amount: u64 },
-    RedeemPt { amount: u64 },
-    Claim,
+    Init {
+        lsu_mint: &Pubkey,
+        expiry: yield_tokenizer::instruction::Expiry,
+    },
+    Tokenize {
+        amount: u64,
+        lsu_mint: &Pubkey,
+        expiry: yield_tokenizer::instruction::Expiry,
+    },
+    Redeem {
+        amount: u64,
+        lsu_mint: &Pubkey,
+        expiry: yield_tokenizer::instruction::Pubkey,
+    },
+    RedeemPt {
+        amount: u64,
+        lsu_mint: &Pubkey,
+        expiry:: yield_tokenizer::instruction::Pubkey,
+    },
+    Claim {
+        lsu_mint: &Pubkey,
+        expiry: yield_tokenizer::instruction::Pubkey,
+    },
 }
 
 fn main() -> Result<()> {
@@ -58,7 +76,9 @@ fn main() -> Result<()> {
     let ix: Instruction;
 
     match args.commands {
-        Commands::Init => unimplemented!(),
+        Commands::Init { lsu_mint, expiry } => {
+            yield_tokenizer::instruction::init_yield_tokenizer(yield_tokenizer::id(), wallet_pubkey)
+        }
         Commands::Tokenize { amount } => unimplemented!(),
         Commands::Redeem { amount } => unimplemented!(),
         Commands::RedeemPt { amount } => unimplemented!(),
